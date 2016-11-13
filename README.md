@@ -1,8 +1,7 @@
 # go-remind
 知行合一，不忘初心
 
-## todo
-
+## TODO
 1. main.go作为应用入口，初始化基本资源，配置信息，监听端口。
 2. POST请求支持 `/controller/action/` + JSON请求体。
 3. GET请求支持 `/controller/action/p1/v1/p2/v2/..` 格式。

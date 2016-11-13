@@ -5,16 +5,21 @@ import (
 	"html"
 	"log"
 	"net/http"
+
+	"github.com/cybersword/string"
 )
 
 // HelloServer just say hello
 func HelloServer(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("Inside HelloServer handler")
-	fmt.Fprintf(w, "Hello,"+req.URL.Path[1:])
+	fmt.Fprintf(w, "Hello,"+req.URL.Path[1:]+"\n")
+	s := req.URL.Path[1:]
+	fmt.Fprintf(w, string.Reverse(s))
 }
 
 func fooHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+	fmt.Fprintf(w, "ss")
 }
 
 func main() {

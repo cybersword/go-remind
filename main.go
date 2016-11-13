@@ -19,7 +19,6 @@ func HelloServer(w http.ResponseWriter, req *http.Request) {
 
 func fooHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
-
 	fmt.Fprintf(w, "cybersword")
 }
 

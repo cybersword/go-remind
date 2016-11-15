@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"html"
 	"io"
+	"io/ioutil"
 	"log"
+	"encoding/json"
 	"net/http"
 )
 
@@ -21,11 +23,21 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	case "GET":
 		io.WriteString(w, `{"code": 0, "msg": "GET"}`)
 	case "POST":
-        /* handle the form data, note that ParseForm must
-           be called before we can extract form data */
-        	req.ParseForm();
-        	io.WriteString(w, req.Form["user"][0])
+		   contentType := req.Header.Get("Content-Type")
+		   io.WriteString(w, contentType+"\n")
+		   switch contentType {
+		   case "application/json":
+var mapBody map[string]interface{}
+body, _ := ioutil.ReadAll(req.Body)
+json.Unmarshal(body, &mapBody)
+		   io.WriteString(w, mapBody["user"].(string))
+		   default:
+req.ParseForm();
+        io.WriteString(w, req.Form["user"][0])
 		io.WriteString(w, req.FormValue("plan"))
+			   
+		   }
+
 	}
 }
 

@@ -17,7 +17,7 @@ func helloHandle(w http.ResponseWriter, req *http.Request) {
 }
 
 func indexHandle(w http.ResponseWriter, req *http.Request) {
-	switch request.Method {
+	switch req.Method {
 	case "GET":
 		io.WriteString(w, `{"code": 0, "msg": "GET"}`)
 	case "POST":
@@ -25,7 +25,7 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
            be called before we can extract form data */
         	req.ParseForm();
         	io.WriteString(w, req.Form["user"])
-		io.WriteString(w, request.FormValue("plan"))
+		io.WriteString(w, req.FormValue("plan"))
 	}
 }
 

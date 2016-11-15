@@ -24,7 +24,7 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
         /* handle the form data, note that ParseForm must
            be called before we can extract form data */
         	req.ParseForm();
-        	io.WriteString(w, req.Form["user"])
+        	io.WriteString(w, req.Form["user"][0])
 		io.WriteString(w, req.FormValue("plan"))
 	}
 }

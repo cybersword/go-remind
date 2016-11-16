@@ -3,23 +3,27 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"html"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
-// helloHandle just say hello
-func helloHandle(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("Inside HelloServer handler")
-	fmt.Fprintln(w, "<html><body>")
-	fmt.Fprintf(w, "Hello, "+req.URL.Path[1:]+"\n")
-	io.WriteString(w, "<h1>hello, world</h1>\n")
+func wikiHandle(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintln(w, "<html><head><title>Remind</title></head><body>")
+	io.WriteString(w, "<h1>Remind ...</h1>\n")
 	fmt.Fprintln(w, "</body></html>")
 }
 
 func indexHandle(w http.ResponseWriter, req *http.Request) {
+	io.WriteString(w, req.RequestURI)
+	io.WriteString(w, req.URL.Path)
+	ss := strings.Split(req.URL.Path, "/")
+	for _, s := range ss {
+		io.WriteString(w, s+"\n")
+	}
+	//u, err := url.Parse(r)
 	switch req.Method {
 	case "GET":
 		io.WriteString(w, `{"code": 0, "msg": "GET"}`)
@@ -43,10 +47,10 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/hello", helloHandle)
+	http.HandleFunc("/wiki", wikiHandle)
 	// 最长匹配原则
-	http.HandleFunc("/bar", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+	http.HandleFunc("/bar", func(w http.ResponseWriter, req *http.Request) {
+		fmt.Fprintf(w, "Hello, "+req.URL.Path[1:]+"\n")
 	})
 	http.HandleFunc("/", indexHandle)
 	err := http.ListenAndServe("localhost:8765", nil)

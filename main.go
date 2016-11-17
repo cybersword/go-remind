@@ -10,6 +10,12 @@ import (
 	"strings"
 )
 
+type res struct {
+	code int
+	msg  string
+	data map[string]interface{}
+}
+
 func wikiHandle(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintln(w, "<html><head><title>Remind</title></head><body>")
 	io.WriteString(w, "<h1>Remind ...</h1>\n")
@@ -17,6 +23,7 @@ func wikiHandle(w http.ResponseWriter, req *http.Request) {
 }
 
 func indexHandle(w http.ResponseWriter, req *http.Request) {
+
 	io.WriteString(w, req.RequestURI)
 	io.WriteString(w, req.URL.Path)
 	ss := strings.Split(req.URL.Path, "/")
@@ -30,21 +37,30 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	case "POST":
 		contentType := req.Header.Get("Content-Type")
 		io.WriteString(w, contentType+"\n")
-
+		body, _ := ioutil.ReadAll(req.Body)
 		switch contentType {
 		case "application/json":
 			var mapBody map[string]interface{}
-			body, _ := ioutil.ReadAll(req.Body)
+
 			json.Unmarshal(body, &mapBody)
 			io.WriteString(w, mapBody["user"].(string))
-		default:
+		case "application/x-www-form-urlencoded;charset=utf-8":
+
 			req.ParseForm()
 			// io.WriteString(w, req.Form["user"][0])
 			// io.WriteString(w, req.FormValue("plan"))
+			var m map[string]interface{}
 			for k, v := range req.Form {
 				// io.WriteString(w, k+v[0])
 				fmt.Fprintf(w, "%s : %s\n", k, v[0])
+				m[k] = v[0]
 			}
+			r := res{0, "form", m}
+			j, _ := json.Marshal(r)
+			io.WriteString(w, string(j))
+		default:
+			fmt.Fprintf(w, string(body))
+
 		}
 
 	}

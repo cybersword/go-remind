@@ -5,8 +5,7 @@ GET http://127.0.0.1:8765/hello
 POST http://127.0.0.1:8765 HTTP/1.1
 Content-Type: application/x-www-form-urlencoded;charset=utf-8
 
-user=wangyu
-plan=123
+user=wangyu&plan=123
 
 ###
 

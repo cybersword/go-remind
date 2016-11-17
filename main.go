@@ -39,8 +39,12 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 			io.WriteString(w, mapBody["user"].(string))
 		default:
 			req.ParseForm()
-			io.WriteString(w, req.Form["user"][0])
-			io.WriteString(w, req.FormValue("plan"))
+			// io.WriteString(w, req.Form["user"][0])
+			// io.WriteString(w, req.FormValue("plan"))
+			for k, v := range req.Form {
+				// io.WriteString(w, k+v[0])
+				fmt.Fprintf(w, "%s : %s\n", k, v[0])
+			}
 		}
 
 	}

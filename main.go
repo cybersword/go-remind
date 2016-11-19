@@ -72,14 +72,15 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 			json.Unmarshal(body, &mapBody)
 			// io.WriteString(w, mapBody["user"].(string))
 			result.Data["JSON"] = mapBody
-		case "application/x-www-form-urlencoded;charset=utf-8":
-			err := req.ParseForm()
-			if err != nil {
-				fmt.Println(err)
-			}
-			// io.WriteString(w, req.Form["user"][0])
+		case "application/x-www-form-urlencoded":
+			// err := req.ParseForm()
+			// if err != nil {
+			// fmt.Println(err)
+			// }
 			// io.WriteString(w, req.FormValue("plan"))
-			m := make(map[string]string)
+			m := make(map[string]interface{})
+			// m["user"] = req.Form["user"][0]
+			m["plan"] = req.FormValue("plan")
 			fmt.Println(req.Form)
 			for k, v := range req.Form {
 				// io.WriteString(w, k+v[0])

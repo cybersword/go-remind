@@ -59,6 +59,10 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	switch req.Method {
 	case "GET":
 		result.Code = OK
+	case "PUT":
+		fallthrough
+	case "PATCH":
+		fallthrough
 	case "POST":
 		ct := req.Header.Get("Content-Type")
 		result.Msg += " -- " + ct
@@ -70,7 +74,9 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 			json.Unmarshal(body, &m)
 			params["JSON"] = m
 		case "application/x-www-form-urlencoded":
+			// 已经通过 ParseForm 解析过了
 		default:
+			// 其它不支持的类型
 			params["BODY"] = string(body)
 		}
 	}

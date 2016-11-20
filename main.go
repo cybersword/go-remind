@@ -6,7 +6,9 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -32,81 +34,75 @@ func wikiHandle(w http.ResponseWriter, req *http.Request) {
 func indexHandle(w http.ResponseWriter, req *http.Request) {
 	// io.WriteString(w, req.RequestURI)
 	// io.WriteString(w, req.URL.Path)
-
+	// init params
 	msg := "[" + req.Method + "]" + req.URL.Path
-	ss := strings.Split(req.URL.Path, "/")[1:]
+	ss := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
 	ns := len(ss)
-	data := make(map[string]interface{})
+	params := make(map[string]interface{})
 	p := 0
-	if ns > p {
-		data["app"] = ss[0]
-		p++
+	arrRoute := []string{"app", "controller", "action"}
+	for ; p < ns; p++ {
+		params[arrRoute[p]] = ss[p]
 	}
-	if ns > p {
-		data["controller"] = ss[1]
-		p++
-	}
-	if ns > p {
-		data["action"] = ss[2]
-		p++
-	}
-	if ns > p && ns%2 == 0 {
-		data["version"] = ss[3]
+	if p < ns && ns%2 == 0 {
+		params["version"] = ss[p]
 		p++
 	}
 	for ; p < ns; p += 2 {
-		data[ss[p]] = ss[p+1]
+		params[ss[p]] = ss[p+1]
 	}
-	result := res{ERROR, msg, data}
-	//u, err := url.Parse(r)
+	result := res{ERROR, msg, nil}
+	req.ParseForm() // parse params in POST|PUT|PATCH body form and params in query
+	fmt.Println(req.Form)
+	params["FORM"] = req.Form
+	params["METHOD"] = req.Method
 	switch req.Method {
 	case "GET":
 		result.Code = OK
 	case "POST":
-		contentType := req.Header.Get("Content-Type")
-		result.Msg += "--" + contentType
+		ct := req.Header.Get("Content-Type")
+		result.Msg += " -- " + ct
 		body, _ := ioutil.ReadAll(req.Body)
-		switch contentType {
+		ct, _, _ = mime.ParseMediaType(ct)
+		switch ct {
 		case "application/json":
-			var mapBody map[string]interface{}
-			json.Unmarshal(body, &mapBody)
-			// io.WriteString(w, mapBody["user"].(string))
-			result.Data["JSON"] = mapBody
+			var m map[string]interface{}
+			json.Unmarshal(body, &m)
+			params["JSON"] = m
 		case "application/x-www-form-urlencoded":
-			// err := req.ParseForm()
-			// if err != nil {
-			// fmt.Println(err)
-			// }
-			// io.WriteString(w, req.FormValue("plan"))
-			m := make(map[string]interface{})
-			// m["user"] = req.Form["user"][0]
-			m["plan"] = req.FormValue("plan")
-			fmt.Println(req.Form)
-			for k, v := range req.Form {
-				// io.WriteString(w, k+v[0])
-				fmt.Printf("%s : %s\n", k, v[0])
-				m[k] = v[0]
-			}
-			result.Data["FORM"] = req.Form
 		default:
-			result.Data["BODY"] = string(body)
-
+			params["BODY"] = string(body)
 		}
-
 	}
+
+	// call process func here
+	fmt.Println(params)
 	j, _ := json.Marshal(result)
 	fmt.Println(result)
 	io.WriteString(w, string(j))
 }
 
 func main() {
+	logFileName := "debug.log"
+	logFile, err := os.Create(logFileName)
+	if err != nil {
+		log.Fatalln("open log file error !")
+	}
+	defer logFile.Close()
+
+	debugLog := log.New(logFile, "[Debug]", log.Lshortfile|log.LstdFlags)
+	debugLog.Println("A debug message here")
+	debugLog.SetPrefix("[Info]")
+	debugLog.Println("A Info Message here ")
+	debugLog.SetFlags(debugLog.Flags() | log.Lmicroseconds)
+	debugLog.Println("A different prefix")
 	http.HandleFunc("/wiki", wikiHandle)
 	// 最长匹配原则
 	http.HandleFunc("/bar", func(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Hello, "+req.URL.Path[1:]+"\n")
 	})
 	http.HandleFunc("/", indexHandle)
-	err := http.ListenAndServe("localhost:8765", nil)
+	err = http.ListenAndServe("localhost:8765", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
 	}

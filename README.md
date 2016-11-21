@@ -10,11 +10,15 @@
     * query 中的参数`?k1=v1&k2=v2`，会解析到`params["FORM"]`中。
     * `POST`、`PUT`、`PATCH`请求，`Content-Type: application/x-www-form-urlencoded`的内容会一并解析到`params["FORM"]`中。
     * `POST`、`PUT`、`PATCH`请求，`Content-Type: application/json`的内容会解析到`params["JSON"]`中。
+4. 简单封装了日志模块SimpleLogger，全局获取单例，支持`notice`和`fatal`两个级别，输出到不同的文件。
+
+## TODO
+1. SimpleLogger 需要考虑并发场景下的线程安全（加锁）。
+2. SimpleLogger 支持按时间和路由切分日志。
 4. API查询接口 `/app` 、 `/app/controller`。
 5. 关键日志存入 MySQL，关键配置存入 Redis（例如，工艺流程）。
 6. 支持 SQLite 小数据处理。
-7. 支持复杂流程控制。
-8. 避免硬编码。
+7. 支持复杂流程控制，利用 Redis 进行并发流程控制。
 9. 支持热上线。
 
 ## 代码结构

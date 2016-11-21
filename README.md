@@ -4,7 +4,8 @@
 ## 摘要
 1. main.go作为应用入口，初始化基本资源，配置信息，监听端口，组装请求参数，路由到 app。
 2. 支持 RESTful API
-3. query 格式：`/app/controller/action/version/p1/v1/p2/v2` 形式。
+3. query 格式：
+    * `/app/controller/action/version/p1/v1/p2/v2` 形式。
     * `app`,`controller`,`action`,`version` 为预置的层级，用于路由，`version`可省略。
     * 其中 `/p1/v1 ... /pn/vn` 必须成对出现。
     * query 中的参数`?k1=v1&k2=v2`，会解析到`params["FORM"]`中。

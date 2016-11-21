@@ -31,7 +31,10 @@ func GetSimpleLogger() *SimpleLogger {
 	}
 	dirLog := "."
 	fileLog, _ := os.Create(path.Join(dirLog, "debug.log"))
-	fileLogWF, _ := os.Create(path.Join(dirLog, "debug.wf.log"))
+	fileLogWF, err := os.Create(path.Join(dirLog, "debug.wf.log"))
+	if err != nil {
+		panic(err)
+	}
 	psl.normal = log.New(fileLog, "[Info]", log.Lshortfile|log.LstdFlags)
 	psl.wf = log.New(fileLogWF, "[Fatal]", log.Lshortfile|log.LstdFlags)
 	return psl

@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/cybersword/go-remind/utils"
 )
 
 // OK 0
@@ -96,6 +98,10 @@ func main() {
 	}
 	defer logFile.Close()
 
+	sl := utils.GetSimpleLogger()
+	sl.Notice("我是notice1")
+	sl.Fatal("bugbugbug")
+	sl.Notice("我是notice2")
 	debugLog := log.New(logFile, "[Debug]", log.Lshortfile|log.LstdFlags)
 	debugLog.Println("A debug message here")
 	debugLog.SetPrefix("[Info]")

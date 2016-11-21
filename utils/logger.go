@@ -21,7 +21,17 @@ func (sl *SimpleLogger) Notice(msg string) {
 
 // Fatal warnning and fatal
 func (sl *SimpleLogger) Fatal(msg string) {
-	sl.normal.Println(msg)
+	sl.wf.Println(msg)
+}
+
+// SetLogger init
+func (sl *SimpleLogger) SetLogger(l *log.Logger, level int) {
+	switch level {
+	case 1:
+		sl.normal = l
+	case 2:
+		sl.wf = l
+	}
 }
 
 // GetSimpleLogger single instance
@@ -35,7 +45,9 @@ func GetSimpleLogger() *SimpleLogger {
 	if err != nil {
 		panic(err)
 	}
-	psl.normal = log.New(fileLog, "[Info]", log.Lshortfile|log.LstdFlags)
-	psl.wf = log.New(fileLogWF, "[Fatal]", log.Lshortfile|log.LstdFlags)
+
+	pl1 := log.New(fileLog, "[Info]", log.Lshortfile|log.LstdFlags)
+	pl2 := log.New(fileLogWF, "[Fatal]", log.Lshortfile|log.LstdFlags)
+	psl = &SimpleLogger{pl1, pl2}
 	return psl
 }

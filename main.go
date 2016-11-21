@@ -8,7 +8,6 @@ import (
 	"log"
 	"mime"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/cybersword/go-remind/utils"
@@ -91,30 +90,25 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	logFileName := "debug.log"
-	logFile, err := os.Create(logFileName)
-	if err != nil {
-		log.Fatalln("open log file error !")
-	}
-	defer logFile.Close()
 
 	sl := utils.GetSimpleLogger()
 	sl.Notice("我是notice1")
 	sl.Fatal("bugbugbug")
 	sl.Notice("我是notice2")
-	debugLog := log.New(logFile, "[Debug]", log.Lshortfile|log.LstdFlags)
-	debugLog.Println("A debug message here")
-	debugLog.SetPrefix("[Info]")
-	debugLog.Println("A Info Message here ")
-	debugLog.SetFlags(debugLog.Flags() | log.Lmicroseconds)
-	debugLog.Println("A different prefix")
+
+	// debugLog := log.New(logFile, "[Debug]", log.Lshortfile|log.LstdFlags)
+	// debugLog.Println("A debug message here")
+	// debugLog.SetPrefix("[Info]")
+	// debugLog.Println("A Info Message here ")
+	// debugLog.SetFlags(debugLog.Flags() | log.Lmicroseconds)
+	// debugLog.Println("A different prefix")
 	http.HandleFunc("/wiki", wikiHandle)
 	// 最长匹配原则
 	http.HandleFunc("/bar", func(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Hello, "+req.URL.Path[1:]+"\n")
 	})
 	http.HandleFunc("/", indexHandle)
-	err = http.ListenAndServe("localhost:8765", nil)
+	err := http.ListenAndServe("localhost:8765", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err.Error())
 	}

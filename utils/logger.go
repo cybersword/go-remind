@@ -24,8 +24,8 @@ func (sl *SimpleLogger) Fatal(msg string) {
 	sl.wf.Println(msg)
 }
 
-// SetLogger init
-func (sl *SimpleLogger) SetLogger(l *log.Logger, level int) {
+// SetOutput reset log writer
+func (sl *SimpleLogger) SetOutput(l *log.Logger, level int) {
 	switch level {
 	case 1:
 		sl.normal = l

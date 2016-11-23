@@ -91,17 +91,10 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 
-	sl := utils.GetSimpleLogger()
-	sl.Notice("我是notice1")
-	sl.Fatal("bugbugbug")
-	sl.Notice("我是notice2")
+	utils.Notice("我是notice")
+	utils.Fatal("error static func")
+	utils.Notice("第二条日志")
 
-	// debugLog := log.New(logFile, "[Debug]", log.Lshortfile|log.LstdFlags)
-	// debugLog.Println("A debug message here")
-	// debugLog.SetPrefix("[Info]")
-	// debugLog.Println("A Info Message here ")
-	// debugLog.SetFlags(debugLog.Flags() | log.Lmicroseconds)
-	// debugLog.Println("A different prefix")
 	http.HandleFunc("/wiki", wikiHandle)
 	// 最长匹配原则
 	http.HandleFunc("/bar", func(w http.ResponseWriter, req *http.Request) {

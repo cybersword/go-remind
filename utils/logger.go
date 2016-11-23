@@ -14,6 +14,16 @@ type SimpleLogger struct {
 
 var psl *SimpleLogger
 
+// Notice like a static function
+func Notice(msg string) {
+	GetSimpleLogger().Notice(msg)
+}
+
+// Fatal warnning and fatal level
+func Fatal(msg string) {
+	GetSimpleLogger().Fatal(msg)
+}
+
 // Notice info and debug
 func (sl *SimpleLogger) Notice(msg string) {
 	sl.normal.Println(msg)
@@ -22,6 +32,9 @@ func (sl *SimpleLogger) Notice(msg string) {
 // Fatal warnning and fatal
 func (sl *SimpleLogger) Fatal(msg string) {
 	sl.wf.Println(msg)
+	sl.normal.SetPrefix("[Fatal]")
+	sl.normal.Println(msg)
+	sl.normal.SetPrefix("[Notice]")
 }
 
 // SetOutput reset log writer
@@ -46,7 +59,7 @@ func GetSimpleLogger() *SimpleLogger {
 		panic(err)
 	}
 
-	pl1 := log.New(fileLog, "[Info]", log.Lshortfile|log.LstdFlags)
+	pl1 := log.New(fileLog, "[Notice]", log.Lshortfile|log.LstdFlags)
 	pl2 := log.New(fileLogWF, "[Fatal]", log.Lshortfile|log.LstdFlags)
 	psl = &SimpleLogger{pl1, pl2}
 	return psl

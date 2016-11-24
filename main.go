@@ -83,7 +83,15 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// call process func here
-	fmt.Println(params)
+	// if ns > 5 {
+	// 	fmt.Println(params)
+	// 	dawn := reflect.ValueOf(&app.App{"dawn"})
+	// 	f := dawn.MethodByName(strings.Title(ss[1]))
+	// 	in := make([]reflect.Value, 1)
+	// 	in[0] = reflect.ValueOf(params)
+	// 	f.Call(in)
+	// }
+
 	j, _ := json.Marshal(result)
 	fmt.Println(result)
 	io.WriteString(w, string(j))

@@ -1,3 +1,10 @@
+// Package utils implements some helper functions, which are esay to use.
+
+// logger.go - defines a type, SimpleLogger, with methods for output log.
+// The Notice function writes the log message to xxx.log with [Notice] prefix.
+// The Fatal function writes the log message to both xxx.wf.log and xxx.log with [Fatal] prefix.
+// The difference between utils.Notice with log.Println is write to file or echo on screen.
+
 package utils
 
 import (
@@ -14,14 +21,14 @@ type SimpleLogger struct {
 
 var psl *SimpleLogger
 
-// Notice like a static function
+// Notice writes the log message to xxx.log with [Notice] prefix.
 func Notice(msg string) {
 	GetSimpleLogger().Notice(msg)
 }
 
-// Fatal warnning and fatal level
-func Fatal(msg string) {
-	GetSimpleLogger().Fatal(msg)
+// Fatal  writes the log message to both xxx.wf.log and xxx.log with [Fatal] prefix.
+func Fatal(v ...interface{}) {
+	GetSimpleLogger().Fatal(v)
 }
 
 // Notice info and debug
@@ -30,10 +37,10 @@ func (sl *SimpleLogger) Notice(msg string) {
 }
 
 // Fatal warnning and fatal
-func (sl *SimpleLogger) Fatal(msg string) {
-	sl.wf.Println(msg)
+func (sl *SimpleLogger) Fatal(v ...interface{}) {
+	sl.wf.Println(v)
 	sl.normal.SetPrefix("[Fatal]")
-	sl.normal.Println(msg)
+	sl.normal.Println(v)
 	sl.normal.SetPrefix("[Notice]")
 }
 

@@ -2,14 +2,14 @@ GET http://127.0.0.1:8765/wiki
 
 ###
 
-POST http://127.0.0.1:8765/mica/plan/create HTTP/1.1
+POST http://127.0.0.1:8765/mica/plan/create/type/ugc/mark/10 HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 
 user=wangyu&plan=123
 
 ###
 
-POST http://127.0.0.1:8765/dawn?a=s HTTP/1.1
+POST http://127.0.0.1:8765/dawn/task/create HTTP/1.1
 Content-Type: application/json
 
 {

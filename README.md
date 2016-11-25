@@ -2,7 +2,7 @@
 知行合一，不忘初心
 
 ## 摘要
-1. main.go作为应用入口，初始化基本资源，配置信息，监听端口，组装请求参数，路由到 app。
+1. main.go作为应用入口，初始化基本资源，配置信息，监听端口，组装请求参数，路由到 controller。
 2. 支持 RESTful API
 3. query 格式：
     * `/app/controller/action/version/p1/v1/p2/v2` 形式。
@@ -12,6 +12,8 @@
     * `POST`、`PUT`、`PATCH`请求，`Content-Type: application/x-www-form-urlencoded`的内容会一并解析到`params["FORM"]`中。
     * `POST`、`PUT`、`PATCH`请求，`Content-Type: application/json`的内容会解析到`params["JSON"]`中。
 4. 简单封装了日志模块SimpleLogger，用法:`utils.Notice(msg)`。支持`Notice`和`Fatal`两个级别，输出到不同的文件。
+5. `package app`中根据业务编写`controller`来执行`action`。
+6. 路由机制通过反射实现，理论上性能会比配置map差。(●'◡'●)
 
 ## TODO
 1. SimpleLogger 需要考虑并发场景下的线程安全（加锁）。

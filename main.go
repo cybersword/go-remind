@@ -8,21 +8,23 @@ import (
 	"log"
 	"mime"
 	"net/http"
+	"reflect"
 	"strings"
 
+	"github.com/cybersword/go-remind/app"
 	"github.com/cybersword/go-remind/utils"
 )
 
 // OK 0
 const (
-	OK int = iota
+	OK int64 = iota
 	ERROR
 )
 
 type res struct {
-	Code int                    `json:"code"`
-	Msg  string                 `json:"msg"`
-	Data map[string]interface{} `json:"data"`
+	Code int64       `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
 }
 
 func wikiHandle(w http.ResponseWriter, req *http.Request) {
@@ -33,17 +35,18 @@ func wikiHandle(w http.ResponseWriter, req *http.Request) {
 }
 
 func indexHandle(w http.ResponseWriter, req *http.Request) {
+	msg := "[" + req.Method + "]" + req.URL.Path
 	// io.WriteString(w, req.RequestURI)
 	// io.WriteString(w, req.URL.Path)
 	// init params
-	msg := "[" + req.Method + "]" + req.URL.Path
+	params := make(map[string]interface{})
 	ss := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
 	ns := len(ss)
-	params := make(map[string]interface{})
+	rr := []string{"app", "controller", "action"}
+	nr := len(rr)
 	p := 0
-	arrRoute := []string{"app", "controller", "action"}
-	for ; p < ns; p++ {
-		params[arrRoute[p]] = ss[p]
+	for ; p < ns && p < nr; p++ {
+		params[rr[p]] = ss[p]
 	}
 	if p < ns && ns%2 == 0 {
 		params["version"] = ss[p]
@@ -83,17 +86,30 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// call process func here
-	// if ns > 5 {
-	// 	fmt.Println(params)
-	// 	dawn := reflect.ValueOf(&app.App{"dawn"})
-	// 	f := dawn.MethodByName(strings.Title(ss[1]))
-	// 	in := make([]reflect.Value, 1)
-	// 	in[0] = reflect.ValueOf(params)
-	// 	f.Call(in)
-	// }
+	vc, ok := params["controller"]
+	if !ok {
+		result.Msg = "hello?"
+	} else {
+		c := strings.Title(vc.(string))
+		dawn := &app.App{Name: "dawn"}
+		v := reflect.ValueOf(dawn)
+		t := reflect.TypeOf(dawn)
+		_, ok := t.MethodByName(c)
+		if !ok {
+			result.Msg = "controller not found"
+		} else {
+			f := v.MethodByName(c)
+
+			in := []reflect.Value{reflect.ValueOf(params)}
+			ret := f.Call(in)
+			result.Code = ret[0].Int()
+			result.Msg = ret[1].String()
+			result.Data = ret[2].Interface()
+		}
+	}
 
 	j, _ := json.Marshal(result)
-	fmt.Println(result)
+	utils.Notice(result)
 	io.WriteString(w, string(j))
 }
 

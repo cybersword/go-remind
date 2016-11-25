@@ -20,6 +20,12 @@ Content-Type: application/json
 
 ###
 
-GET http://127.0.0.1:8765/app/controler/zone/action/p1/v1/p2/v2?a=3&b=c,d
+GET http://127.0.0.1:8765/mica/plan/create/type/ugc/mark/10
 
 ###
+
+GET http://127.0.0.1:8765/just/another/
+
+###
+
+GET http://127.0.0.1:8765/road

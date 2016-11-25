@@ -22,8 +22,8 @@ type SimpleLogger struct {
 var psl *SimpleLogger
 
 // Notice writes the log message to xxx.log with [Notice] prefix.
-func Notice(msg string) {
-	GetSimpleLogger().Notice(msg)
+func Notice(v ...interface{}) {
+	GetSimpleLogger().Notice(v)
 }
 
 // Fatal  writes the log message to both xxx.wf.log and xxx.log with [Fatal] prefix.
@@ -32,8 +32,8 @@ func Fatal(v ...interface{}) {
 }
 
 // Notice info and debug
-func (sl *SimpleLogger) Notice(msg string) {
-	sl.normal.Println(msg)
+func (sl *SimpleLogger) Notice(v ...interface{}) {
+	sl.normal.Println(v)
 }
 
 // Fatal warnning and fatal

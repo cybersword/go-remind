@@ -19,7 +19,7 @@
 1. SimpleLogger 需要考虑并发场景下的线程安全（加锁）。
 2. SimpleLogger 支持按时间和路由切分日志。
 4. API查询接口 `/app` 、 `/app/controller`。
-5. 关键日志存入 MySQL，关键配置存入 Redis（例如，工艺流程）。
+5. MySQL + Redis。
 6. 支持 SQLite 小数据处理。
 7. 支持复杂流程控制，利用 Redis 进行并发流程控制。
 9. 支持热上线。

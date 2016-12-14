@@ -51,6 +51,8 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	if p < ns && ns%2 == 0 {
 		params["version"] = ss[p]
 		p++
+	} else {
+		params["version"] = "master"
 	}
 	for ; p < ns; p += 2 {
 		params[ss[p]] = ss[p+1]

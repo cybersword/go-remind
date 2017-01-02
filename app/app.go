@@ -14,7 +14,7 @@ func (a *App) Hi(params map[string]interface{}) string {
 
 	form, ok := params["FORM"].(map[string]string)
 	if !ok {
-		utils.Fatal("IM Hi 解析 FORM 失败")
+		utils.Fatal("IM Hi 解析 FORM 失败", params["FORM"])
 		return "err"
 	}
 	echo, ok := form["echostr"]

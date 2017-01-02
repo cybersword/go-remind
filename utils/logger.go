@@ -23,24 +23,24 @@ var psl *SimpleLogger
 
 // Notice writes the log message to xxx.log with [Notice] prefix.
 func Notice(v ...interface{}) {
-	GetSimpleLogger().Notice(v)
+	GetSimpleLogger().Notice(v...) // 透传可变参数
 }
 
 // Fatal  writes the log message to both xxx.wf.log and xxx.log with [Fatal] prefix.
 func Fatal(v ...interface{}) {
-	GetSimpleLogger().Fatal(v)
+	GetSimpleLogger().Fatal(v...)
 }
 
 // Notice info and debug
 func (sl *SimpleLogger) Notice(v ...interface{}) {
-	sl.normal.Println(v)
+	sl.normal.Println(v...)
 }
 
 // Fatal warnning and fatal
 func (sl *SimpleLogger) Fatal(v ...interface{}) {
-	sl.wf.Println(v)
+	sl.wf.Println(v...)
 	sl.normal.SetPrefix("[Fatal]")
-	sl.normal.Println(v)
+	sl.normal.Println(v...)
 	sl.normal.SetPrefix("[Notice]")
 }
 

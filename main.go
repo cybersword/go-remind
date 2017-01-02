@@ -15,14 +15,8 @@ import (
 	"github.com/cybersword/go-remind/utils"
 )
 
-// OK 0
-const (
-	OK int64 = iota
-	ERROR
-)
-
 type res struct {
-	Code int64       `json:"code"`
+	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data"`
 }
@@ -36,6 +30,7 @@ func wikiHandle(w http.ResponseWriter, req *http.Request) {
 
 func indexHandle(w http.ResponseWriter, req *http.Request) {
 	msg := "[" + req.Method + "]" + req.URL.Path
+	utils.Notice(msg)
 	// io.WriteString(w, req.RequestURI)
 	// io.WriteString(w, req.URL.Path)
 	// init params
@@ -55,14 +50,13 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	for ; p < ns; p += 2 {
 		params[ss[p]] = ss[p+1]
 	}
-	result := res{ERROR, msg, nil}
+	result := res{utils.ERROR, msg, nil}
 	req.ParseForm() // parse params in POST|PUT|PATCH body form and params in query
-	fmt.Println(req.Form)
 	params["FORM"] = req.Form
 	params["METHOD"] = req.Method
 	switch req.Method {
 	case "GET":
-		result.Code = OK
+		result.Code = utils.OK
 	case "PUT":
 		fallthrough
 	case "PATCH":
@@ -85,29 +79,47 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	// call process func here
-	vc, ok := params["controller"]
-	if !ok {
-		result.Msg = "hello?"
+	vApp, ok1 := params["app"]
+	vc, ok2 := params["controller"]
+	if !ok1 {
+		result.Msg = "app not set"
+	} else if !ok2 {
+		result.Msg = "controller not set"
 	} else {
+		// init app
+		appName := strings.ToLower(vApp.(string))
 		c := strings.Title(vc.(string))
-		dawn := &app.App{Name: "dawn"}
-		v := reflect.ValueOf(dawn)
-		t := reflect.TypeOf(dawn)
+		c = strings.Replace(c, " ", "", -1)
+		c = strings.Replace(c, "-", "", -1)
+		c = strings.Replace(c, "_", "", -1)
+		appInstance := &app.App{Name: appName}
+		v := reflect.ValueOf(appInstance)
+		t := reflect.TypeOf(appInstance)
+		// call controller
+		// TODO: 要设计一下不同的响应方式
 		_, ok := t.MethodByName(c)
 		if !ok {
 			result.Msg = "controller not found"
 		} else {
-			f := v.MethodByName(c)
+			// 暂且特殊处理
+			if c == "Hi" {
+				message := appInstance.Hi(params)
+				utils.Notice(message)
+				io.WriteString(w, message)
+				return
 
+			}
+			f := v.MethodByName(c)
 			in := []reflect.Value{reflect.ValueOf(params)}
 			ret := f.Call(in)
-			result.Code = ret[0].Int()
+			result.Code = int(ret[0].Int()) // int64 -> int
 			result.Msg = ret[1].String()
 			result.Data = ret[2].Interface()
 		}
+
 	}
 
+	// response
 	j, _ := json.Marshal(result)
 	utils.Notice(result)
 	io.WriteString(w, string(j))
@@ -115,18 +127,20 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 
-	utils.Notice("我是notice")
-	utils.Fatal("error static func")
-	utils.Notice("第二条日志")
+	utils.Notice("启动检测-Notice")
+	utils.Fatal("启动检测-Fatal")
 
+	// 查看接口文档
 	http.HandleFunc("/wiki", wikiHandle)
-	// 最长匹配原则
-	http.HandleFunc("/bar", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Fprintf(w, "Hello, "+req.URL.Path[1:]+"\n")
+	// 查看当前配置
+	http.HandleFunc("/conf", func(w http.ResponseWriter, req *http.Request) {
+		fmt.Fprintf(w, "Conf:\n"+req.URL.Path[1:]+"\n")
+	})
+	// 健康检查
+	http.HandleFunc("/health", func(w http.ResponseWriter, req *http.Request) {
+		fmt.Fprintf(w, "Health Check:\n"+req.URL.Path[1:]+"\n")
 	})
 	http.HandleFunc("/", indexHandle)
-	err := http.ListenAndServe("localhost:8765", nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err.Error())
-	}
+	err := http.ListenAndServe(":8765", nil) // always returns a non-nil error.
+	log.Fatal("ListenAndServe: ", err.Error())
 }

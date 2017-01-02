@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/xml"
+	"strconv"
 	"time"
 )
 
@@ -34,31 +35,19 @@ func MD5(s string) string {
 // SendTextMessage get response string
 func SendTextMessage(message string, user string) string {
 	ret := "<xml><ToUserName><![CDATA[" + user + "]]></ToUserName>"
-	ret += "<CreateTime>" + string(time.Now().Unix()) + "</CreateTime>"
+	ret += "<CreateTime>" + strconv.FormatInt(time.Now().Unix(), 10) + "</CreateTime>"
 	ret += "<MsgType><![CDATA[text]]></MsgType><Content><![CDATA[" + message + "]]></Content></xml>"
 	return ret
 }
 
 // ReciveTextMessage parse XML
+// <xml>
+// <FromUserName><![CDATA[fromUser]]></FromUserName>
+// <CreateTime></CreateTime>
+// <MsgType>text</MsgType>
+// <Content><![CDATA[this is a test]]></Content>
+// <xml>
 func ReciveTextMessage(message string) (TextMessage, error) {
-	//$postObj = simplexml_load_string($message, 'SimpleXMLElement', LIBXML_NOCDATA);
-	// if ($postObj === false) {
-	//     return false;
-	// }
-	// $username = (string)$postObj->FromUserName;  // SimpleXMLElement --> string
-	// $content = $postObj->Content->__toString();  // 两种转str的方式
-	// return [
-	//     'username' => $username,
-	//     'content' => $content,
-	// ];
-
-	// <xml>
-	// <FromUserName><![CDATA[fromUser]]></FromUserName>
-	// <CreateTime></CreateTime>
-	// <MsgType>text</MsgType>
-	// <Content><![CDATA[this is a test]]></Content>
-	// <xml>
-
 	v := TextMessage{User: "none", MsgType: "text", Content: "none"}
 	err := xml.Unmarshal([]byte(message), &v)
 	return v, err

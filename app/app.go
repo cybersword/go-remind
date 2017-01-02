@@ -61,6 +61,8 @@ func (a *App) Hi(params map[string]interface{}) string {
 	//   DEFAULT CHARSET = utf8;
 	// INSERT INTO book_list SET status=2, book_name="深入理解Nginx：模块开发与架构解析（第2版）",
 	// isbn="9787111526254", url="http://product.dangdang.com/23910258.html", user_name="胡明清", price=78.2;
+	// INSERT INTO book_list SET status=2, book_name="运营之光：我的互联网运营方法论与自白",
+	// isbn="9787121298097", url="http://product.dangdang.com/24029311.html", user_name="高娟", price=28.9;
 	// mysql -hnj02-map-tushang01.nj02 -uroot -proot guoke_lab
 	dsnLab := "root:root@tcp(localhost:3308)/guoke_lab?charset=utf8"
 	db, err := sql.Open("mysql", dsnLab)

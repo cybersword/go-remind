@@ -54,7 +54,7 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	}
 	result := res{utils.ERROR, msg, nil}
 	req.ParseForm() // parse params in POST|PUT|PATCH body form and params in query
-	var form map[string]string
+	form := make(map[string]string)
 	for fk, fv := range req.Form {
 		form[fk] = fv[0]
 	}

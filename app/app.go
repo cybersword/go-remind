@@ -1,6 +1,10 @@
 package app
 
-import "github.com/cybersword/go-remind/utils"
+import (
+	"database/sql"
+
+	"github.com/cybersword/go-remind/utils"
+)
 
 // App entry
 type App struct {
@@ -40,7 +44,53 @@ func (a *App) Hi(params map[string]interface{}) string {
 	user := textMessage.User
 	content := textMessage.Content
 	utils.Notice(user + ":" + content)
-	return utils.SendTextMessage("get it", user)
+	// CREATE TABLE `book_list` (
+	//   `id`               INT UNSIGNED     AUTO_INCREMENT       COMMENT '自增主键',
+	//   `status`           TINYINT UNSIGNED NOT NULL DEFAULT 0   COMMENT '0未购买,1配送中,2已下发',
+	//   `book_name`        VARCHAR(512)     NOT NULL DEFAULT ''  COMMENT '书名',
+	//   `isbn`             VARCHAR(13)      NOT NULL DEFAULT ''  COMMENT 'ISBN-13',
+	//   `url`              VARCHAR(64)      NOT NULL DEFAULT ''  COMMENT 'http://product.dangdang.com/23910258.html',
+	//   `user_name`        VARCHAR(32)      NOT NULL DEFAULT ''  COMMENT '姓名',
+	//   `price`            FLOAT            NOT NULL DEFAULT 0.0 COMMENT '姓名',
+	//   `memo`             VARCHAR(1024)    NOT NULL DEFAULT ''  COMMENT '系统备注',
+	//   `create_time`      TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	//   `update_time`      TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	//   PRIMARY KEY (`id`)
+	// )
+	//   ENGINE = InnoDB
+	//   DEFAULT CHARSET = utf8;
+	// INSERT INTO book_list SET status=2, book_name="深入理解Nginx：模块开发与架构解析（第2版）",
+	// isbn="9787111526254", url="http://product.dangdang.com/23910258.html", user_name="胡明清", price=78.2;
+	// mysql -hnj02-map-tushang01.nj02 -uroot -proot guoke_lab
+	dsnLab := "root:root@tcp(nj02-map-tushang01.nj02.baidu.com:3308)/guoke_lab?charset=utf8"
+	db, err := sql.Open("mysql", dsnLab)
+	if err != nil {
+		utils.Fatal(err)
+		return err.Error()
+	}
+	defer db.Close()
+	if content == "ls" {
+		var ls string
+		s := "SELECT book_name, user_name FROM book_list"
+		rows, err := db.Query(s)
+		if err != nil {
+			utils.Fatal(err)
+			return err.Error()
+		}
+		var bookName string
+		var userName string
+		for rows.Next() {
+			err = rows.Scan(&bookName, &userName)
+			if err != nil {
+				utils.Fatal(err)
+				return err.Error()
+			}
+			ls += userName + ": " + bookName
+		}
+		return utils.SendTextMessage(ls, user)
+	}
+
+	return utils.SendTextMessage("get it: "+content, user)
 }
 
 // Book detail of book

@@ -13,6 +13,8 @@ import (
 
 	"github.com/cybersword/go-remind/app"
 	"github.com/cybersword/go-remind/utils"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type res struct {

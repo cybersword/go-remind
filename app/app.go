@@ -85,7 +85,7 @@ func (a *App) Hi(params map[string]interface{}) string {
 				utils.Fatal(err)
 				return err.Error()
 			}
-			ls += userName + ": " + bookName
+			ls += userName + ": " + bookName + "\n"
 		}
 		return utils.SendTextMessage(ls, user)
 	}

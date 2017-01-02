@@ -62,7 +62,7 @@ func (a *App) Hi(params map[string]interface{}) string {
 	// INSERT INTO book_list SET status=2, book_name="深入理解Nginx：模块开发与架构解析（第2版）",
 	// isbn="9787111526254", url="http://product.dangdang.com/23910258.html", user_name="胡明清", price=78.2;
 	// mysql -hnj02-map-tushang01.nj02 -uroot -proot guoke_lab
-	dsnLab := "root:root@tcp(nj02-map-tushang01.nj02.baidu.com:3308)/guoke_lab?charset=utf8"
+	dsnLab := "root:root@tcp(localhost:3308)/guoke_lab?charset=utf8"
 	db, err := sql.Open("mysql", dsnLab)
 	if err != nil {
 		utils.Fatal(err)

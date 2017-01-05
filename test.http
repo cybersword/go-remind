@@ -2,10 +2,10 @@ GET http://127.0.0.1:8765/wiki
 
 ###
 
-PUT http://127.0.0.1:8765/mica/plan/info/type/ugc/mark/10 HTTP/1.1
+PUT http://127.0.0.1:8765/lab/book/set HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 
-user=wangyu&plan=123
+book_name=运营之光：我的互联网运营方法论与自白&book_isbn=9787121298097&book_url=http://product.dangdang.com/24029311.html&book_price=28.9
 
 ###
 

@@ -4,7 +4,11 @@ import (
 	"database/sql"
 
 	"github.com/cybersword/go-remind/utils"
+	"github.com/monnand/goredis"
 )
+
+// import "github.com/monnand/goredis"
+// import "github.com/garyburd/redigo/redis"
 
 // App entry
 type App struct {
@@ -87,7 +91,7 @@ func (a *App) Hi(params map[string]interface{}) string {
 				utils.Fatal(err)
 				return err.Error()
 			}
-			ls += userName + ": " + bookName + "\n"
+			ls += "【" + userName + "】—— " + bookName + "\n"
 		}
 		return utils.SendTextMessage(ls, user)
 	}
@@ -97,7 +101,53 @@ func (a *App) Hi(params map[string]interface{}) string {
 
 // Book detail of book
 func (a *App) Book(params map[string]interface{}) (int, string, interface{}) {
-	return utils.OK, "Book ok", params
+	form, ok := params["FORM"].(map[string]string)
+	if !ok {
+		utils.Fatal("解析FORM失败", params["FORM"])
+		return utils.ERROR, "解析FORM失败", params["FORM"]
+	}
+
+	bookName := form["book_name"]
+	bookURL := form["book_url"]
+	bookISBN := form["book_isbn"]
+	bookPrice := form["book_price"]
+	book := make(map[string]string)
+	book["name"] = bookName
+	book["url"] = bookURL
+	book["isbn"] = bookISBN
+	book["price"] = bookPrice
+	//nj02-map-tushang01.nj02.baidu.com:8379
+	var client goredis.Client
+	// 设置端口为redis默认端口
+	client.Addr = "nj02-map-tushang01.nj02.baidu.com:8379"
+
+	err := client.Hmset("book:"+bookISBN, book)
+	if err != nil {
+		return utils.ERROR, err.Error(), book
+	}
+
+	bName, err := client.Hget("book:"+bookISBN, "name")
+	if err != nil {
+		return utils.ERROR, err.Error(), book
+	}
+
+	// //字符串操作
+	// client.Set("a", []byte("hello"))
+	// val, _ := client.Get("a")
+	// fmt.Println(string(val))
+	// client.Del("a")
+
+	// //list操作
+	// vals := []string{"a", "b", "c", "d", "e"}
+	// for _, v := range vals {
+	// 	client.Rpush("l", []byte(v))
+	// }
+	// dbvals, _ := client.Lrange("l", 0, 4)
+	// for i, v := range dbvals {
+	// 	println(i, ":", string(v))
+	// }
+	// client.Del("l")
+	return utils.OK, "Book ok", string(bName)
 }
 
 // BookList list of book

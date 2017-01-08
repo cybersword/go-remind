@@ -3,6 +3,10 @@ package app
 import (
 	"database/sql"
 
+	"strings"
+
+	"strconv"
+
 	"github.com/cybersword/go-remind/utils"
 	"github.com/monnand/goredis"
 )
@@ -68,14 +72,17 @@ func (a *App) Hi(params map[string]interface{}) string {
 	// INSERT INTO book_list SET status=2, book_name="运营之光：我的互联网运营方法论与自白",
 	// isbn="9787121298097", url="http://product.dangdang.com/24029311.html", user_name="高娟", price=28.9;
 	// mysql -hnj02-map-tushang01.nj02 -uroot -proot guoke_lab
-	dsnLab := "root:root@tcp(localhost:3308)/guoke_lab?charset=utf8"
+	// dsnLab := "root:root@tcp(localhost:3308)/guoke_lab?charset=utf8"
+	dsnLab := "dev@tcp(10.99.16.33:8765)/test?charset=utf8"
 	db, err := sql.Open("mysql", dsnLab)
 	if err != nil {
 		utils.Fatal(err)
 		return err.Error()
 	}
 	defer db.Close()
+
 	if content == "ls" {
+		// 列清单
 		var ls string
 		s := "SELECT book_name, user_name FROM book_list"
 		rows, err := db.Query(s)
@@ -94,6 +101,22 @@ func (a *App) Hi(params map[string]interface{}) string {
 			ls += "【" + userName + "】—— " + bookName + "\n"
 		}
 		return utils.SendTextMessage(ls, user)
+	} else if strings.Contains(content, "http://product.dangdang.com/") {
+		// 买书
+		arr := strings.Split(content, " ")
+		userName := arr[0]
+		book, err := utils.DangDang(arr[1])
+		if err != nil {
+			utils.Fatal(err)
+			return err.Error()
+		}
+		sql := "INSERT INTO book_list SET book_name='" + book.Name + "', price=" + strconv.FormatFloat(book.Price, 'f', -1, 64)
+		sql += ", user_name='" + userName + "', isbn='" + book.ISBN + "', url='" + book.URL + "', memo='" + userName + "'"
+		result, err := db.Exec(sql)
+		lastID, err := result.LastInsertId()
+		utils.Notice(book, lastID)
+		return utils.SendTextMessage("ok", user)
+
 	}
 
 	return utils.SendTextMessage("get it: "+content, user)

@@ -11,6 +11,9 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/PuerkitoBio/goquery"
+	"github.com/axgle/mahonia"
+
 	"github.com/cybersword/go-remind/app"
 	"github.com/cybersword/go-remind/utils"
 
@@ -132,11 +135,30 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	utils.Notice(result)
 	io.WriteString(w, string(j))
 }
+func ExampleScrape() {
+	doc, err := goquery.NewDocument("http://metalsucks.net")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Find the review items
+	doc.Find(".sidebar-reviews article .content-block").Each(func(i int, s *goquery.Selection) {
+		// For each item found, get the band and title
+		band := s.Find("a").Text()
+		title := s.Find("i").Text()
+		fmt.Printf("Review %d: %s - %s\n", i, band, title)
+	})
+}
+
 
 func main() {
 
 	utils.Notice("启动检测-Notice")
 	utils.Fatal("启动检测-Fatal")
+
+	// ExampleScrape()
+	DangDang("http://product.dangdang.com/23910258.html")
+	DangDang("http://product.dangdang.com/23800641.html")
 
 	// 查看接口文档
 	http.HandleFunc("/wiki", wikiHandle)

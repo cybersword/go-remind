@@ -152,6 +152,6 @@ func main() {
 		fmt.Fprintf(w, "Health Check:\n"+req.URL.Path[1:]+"\n")
 	})
 	http.HandleFunc("/", indexHandle)
-	err := http.ListenAndServe(":8765", nil) // always returns a non-nil error.
+	err := http.ListenAndServe(":8034", nil) // always returns a non-nil error.
 	log.Fatal("ListenAndServe: ", err.Error())
 }

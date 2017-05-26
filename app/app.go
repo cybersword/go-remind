@@ -71,9 +71,8 @@ func (a *App) Hi(params map[string]interface{}) string {
 	// isbn="9787111526254", url="http://product.dangdang.com/23910258.html", user_name="胡明清", price=78.2;
 	// INSERT INTO book_list SET status=2, book_name="运营之光：我的互联网运营方法论与自白",
 	// isbn="9787121298097", url="http://product.dangdang.com/24029311.html", user_name="高娟", price=28.9;
-	// mysql -hnj02-map-tushang01.nj02 -uroot -proot guoke_lab
-	// dsnLab := "root:root@tcp(localhost:3308)/guoke_lab?charset=utf8"
-	dsnLab := "dev@tcp(10.99.16.33:8765)/test?charset=utf8"
+	// dsnLab := "root:root@tcp(localhost:3308)/test_lab?charset=utf8"
+	dsnLab := "dev@tcp(127.0.0.1:3306)/test?charset=utf8"
 	db, err := sql.Open("mysql", dsnLab)
 	if err != nil {
 		utils.Fatal(err)
@@ -139,10 +138,10 @@ func (a *App) Book(params map[string]interface{}) (int, string, interface{}) {
 	book["url"] = bookURL
 	book["isbn"] = bookISBN
 	book["price"] = bookPrice
-	//nj02-map-tushang01.nj02.baidu.com:8379
+
 	var client goredis.Client
 	// 设置端口为redis默认端口
-	client.Addr = "nj02-map-tushang01.nj02.baidu.com:8379"
+	client.Addr = "localhost:8379"
 
 	err := client.Hmset("book:"+bookISBN, book)
 	if err != nil {

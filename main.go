@@ -30,7 +30,7 @@ func wikiHandle(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintln(w, "</body></html>")
 }
 
-func indexHandle(w http.ResponseWriter, req *http.Request) {
+func goHandle(w http.ResponseWriter, req *http.Request) {
 	msg := "[" + req.Method + "]" + req.URL.Path
 	utils.Notice(msg)
 	// io.WriteString(w, req.RequestURI)
@@ -39,7 +39,7 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	params := make(map[string]interface{})
 	ss := strings.Split(strings.Trim(req.URL.Path, "/"), "/")
 	ns := len(ss)
-	rr := []string{"app", "controller", "action"}
+	rr := []string{"controller", "app", "action"}
 	nr := len(rr)
 	p := 0
 	for ; p < ns && p < nr; p++ {
@@ -88,36 +88,45 @@ func indexHandle(w http.ResponseWriter, req *http.Request) {
 	}
 
 	vApp, ok1 := params["app"]
-	vc, ok2 := params["controller"]
+	vAciton, ok2 := params["action"]
 	if !ok1 {
 		result.Msg = "app not set"
 	} else if !ok2 {
-		result.Msg = "controller not set"
+		result.Msg = "action not set"
 	} else {
 		// init app
+		utils.Notice("/go/app/action")
 		appName := strings.ToLower(vApp.(string))
-		c := strings.Title(vc.(string))
-		c = strings.Replace(c, " ", "", -1)
-		c = strings.Replace(c, "-", "", -1)
-		c = strings.Replace(c, "_", "", -1)
-		appInstance := &app.App{Name: appName}
+		actionName := strings.Title(vAciton.(string))
+		actionName = strings.Replace(actionName, " ", "", -1)
+		actionName = strings.Replace(actionName, "-", "", -1)
+		actionName = strings.Replace(actionName, "_", "", -1)
+		appInstance := app.NewApp(appName)
+		if nil == appInstance {
+			result.Msg = "app not found"
+			utils.Notice(result)
+			j, _ := json.Marshal(result)
+			utils.Notice(result)
+			io.WriteString(w, string(j))
+			return
+		}
 		v := reflect.ValueOf(appInstance)
 		t := reflect.TypeOf(appInstance)
-		// call controller
+		// call action
 		// TODO: 要设计一下不同的响应方式
-		_, ok := t.MethodByName(c)
+		_, ok := t.MethodByName(actionName)
 		if !ok {
-			result.Msg = "controller not found"
+			result.Msg = "action not found"
 		} else {
 			// 暂且特殊处理
-			if c == "Hi" {
-				message := appInstance.Hi(params)
+			if actionName == "Hi" {
+				lab := app.Lab{AppName: appName}
+				message := lab.Hi(params)
 				utils.Notice(message)
 				io.WriteString(w, message)
 				return
-
 			}
-			f := v.MethodByName(c)
+			f := v.MethodByName(actionName)
 			in := []reflect.Value{reflect.ValueOf(params)}
 			ret := f.Call(in)
 			result.Code = int(ret[0].Int()) // int64 -> int
@@ -142,16 +151,19 @@ func main() {
 	utils.DangDang("http://product.dangdang.com/23800641.html")
 
 	// 查看接口文档
-	http.HandleFunc("/wiki", wikiHandle)
+	http.HandleFunc("/wiki/", wikiHandle)
 	// 查看当前配置
-	http.HandleFunc("/conf", func(w http.ResponseWriter, req *http.Request) {
+	http.HandleFunc("/conf/", func(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Conf:\n"+req.URL.Path[1:]+"\n")
 	})
 	// 健康检查
-	http.HandleFunc("/health", func(w http.ResponseWriter, req *http.Request) {
+	http.HandleFunc("/health/", func(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Health Check:\n"+req.URL.Path[1:]+"\n")
 	})
-	http.HandleFunc("/", indexHandle)
+	// 功能 /go/ 表示匹配 /go/*
+	http.HandleFunc("/go/", goHandle)
+	// 查看接口文档
+	http.HandleFunc("/", wikiHandle)
 	err := http.ListenAndServe(":8034", nil) // always returns a non-nil error.
 	log.Fatal("ListenAndServe: ", err.Error())
 }

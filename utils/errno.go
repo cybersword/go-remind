@@ -6,6 +6,6 @@ package utils
 
 // OK 0
 const (
-	OK int = iota
+OK int = iota
 	ERROR
 )

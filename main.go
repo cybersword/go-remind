@@ -143,7 +143,7 @@ func goHandle(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-
+	// 日志检测
 	utils.Notice("启动检测-Notice")
 	utils.Fatal("启动检测-Fatal")
 
